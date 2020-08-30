@@ -5,7 +5,7 @@ public class SeamCarver {
     private int height;
     private int width;
     private static final double BORDER = 1000.0; // energy of the border
-    private double[][] dualGradientEnergy; // energy of pixels [width][height]
+    private double[][] dualGradientEnergy; // [width][height] energy of pixels
     private int[][] pixelRGBofPicture; // [width][height] array of RGB of pixels
     private boolean horizontal = true; // orientation of the picture
 
@@ -97,13 +97,24 @@ public class SeamCarver {
     }
 
     // width of current picture
-    public int width()
+    public int width() {
+        return width;
+    }
 
     // height of current picture
-    public int height()
+    public int height() {
+        return height;
+    }
 
-    // energy of pixel at column x and row y
-    public double energy(int x, int y)
+    // energy of pixel at column(width) x and row(height) y
+    public double energy(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            throw new IllegalArgumentException("energy of invalid pixel");
+        }
+
+        if (horizontal) return dualGradientEnergy[x][y];
+        else            return dualGradientEnergy[y][x];
+    }
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam()
