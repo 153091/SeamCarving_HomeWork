@@ -69,11 +69,23 @@ public class SeamCarver {
         int gR = (rgbR >>  8) & 0xFF;
         int bR = (rgbR >>  0) & 0xFF;
 
+        int rX = rR - rL;
+        int gX = gR - gL;
+        int bX = bR - bL;
+        int deltaX = (rX * rX) + (gX * gX) + (bX * bX);
+        int rY = rD - rU;
+        int gY = gD - gU;
+        int bY = bD - bU;
+        int deltaY = (rY * rY) + (gY * gY) + (bY * bY);
+
+        return Math.sqrt(deltaX + deltaY);
 
     }
 
     // current picture
-    public Picture picture() {}
+    public Picture picture() {
+
+    }
 
     // width of current picture
     public int width()
