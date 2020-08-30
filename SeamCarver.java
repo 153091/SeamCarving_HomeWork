@@ -116,6 +116,47 @@ public class SeamCarver {
         else            return dualGradientEnergy[y][x];
     }
 
+    // transpose to vertical
+    private void transposeV() {
+        if (horizontal) {
+            // create empty arrays for RGB and Energy
+            double[][] tempEnergy = new double[height][width];
+            int[][] tempRGB = new int[height][width];
+
+            // insert values
+            for (int i = 0; i < height; i++)
+                for (int j = 0; j < width; j++) {
+                    tempEnergy[i][j] = dualGradientEnergy[j][i];
+                    tempRGB[i][j] = pixelRGBofPicture[j][i];
+                }
+            // exch
+            dualGradientEnergy = tempEnergy;
+            pixelRGBofPicture = tempRGB;
+            horizontal = false;
+        }
+    }
+
+    // transpose to horizontal
+    private void transposeH() {
+        if (!horizontal) {
+            // create empty arrays for RGB and Energy
+            double[][] tempEnergy = new double[width][height];
+            int[][] tempRGB = new int[width][height];
+
+            // insert values
+            for (int i = 0; i < width; i++)
+                for (int j = 0; j < height; j++) {
+                    tempEnergy[i][j] = dualGradientEnergy[j][i];
+                    tempRGB[i][j] = pixelRGBofPicture[j][i];
+                }
+            // exch
+            dualGradientEnergy = tempEnergy;
+            pixelRGBofPicture = tempRGB;
+            horizontal = true;
+        }
+    }
+
+
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam()
 
