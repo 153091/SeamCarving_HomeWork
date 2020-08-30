@@ -6,7 +6,8 @@ public class SeamCarver {
     private int width;
     private static final double BORDER = 1000.0; // energy of the border
     private double[][] dualGradientEnergy; // energy of pixels [width][height]
-    private int[][] pixelsRGBofPicture; // two-dimensional array of RGB of pixels
+    private int[][] pixelRGBofPicture; // [width][height] array of RGB of pixels
+    private boolean horizontal = true; // orientation of the picture
 
 
     // create a seam carver object based on the given picture
@@ -22,12 +23,12 @@ public class SeamCarver {
 
         // dual-gradient energy function
         dualGradientEnergy = new double[width][height];
-        pixelsRGBofPicture = new int[width][height];
+        pixelRGBofPicture = new int[width][height];
 
             // set RGB for each pixel
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++)
-                pixelsRGBofPicture[i][j] = pictureCopy.getRGB(i, j);
+                pixelRGBofPicture[i][j] = pictureCopy.getRGB(i, j);
 
             // 1000 energy for border pixels
             // and compute energy for others
@@ -50,10 +51,10 @@ public class SeamCarver {
 
     // private method for compute energy of pixel
     private double computeEnergy(int width, int height) {
-        int rgbU = pixelsRGBofPicture[width][height - 1];
-        int rgbD = pixelsRGBofPicture[width][height + 1];
-        int rgbL = pixelsRGBofPicture[width - 1][height];
-        int rgbR = pixelsRGBofPicture[width + 1][height];
+        int rgbU = pixelRGBofPicture[width][height - 1];
+        int rgbD = pixelRGBofPicture[width][height + 1];
+        int rgbL = pixelRGBofPicture[width - 1][height];
+        int rgbR = pixelRGBofPicture[width + 1][height];
 
         // this from specification
         int rU = (rgbU >> 16) & 0xFF;
@@ -84,7 +85,15 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
+        Picture currentPicture = new Picture(width, height);
 
+        for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++) {
+                if (horizontal) currentPicture.setRGB(i, j, pixelRGBofPicture[i][j]);
+                else            currentPicture.setRGB(i, j, pixelRGBofPicture[j][i]);
+            }
+
+        return currentPicture;
     }
 
     // width of current picture
