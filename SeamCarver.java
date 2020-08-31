@@ -168,7 +168,7 @@ public class SeamCarver {
         return scan;
     }
 
-    // searching for Seam (vertical seam)
+    // searching for Seam (vertical Seam for horizontal orientation)
     private int[] searchSeam(int width, int height) {
         // if height > 2
         if (height > 2) {
@@ -248,10 +248,19 @@ public class SeamCarver {
     }
 
     // sequence of indices for horizontal seam
-    public int[] findHorizontalSeam()
+    public int[] findHorizontalSeam() {
+        transposeV();
+        int[] seam = searchSeam(height, width);
+        return seam;
+
+    }
 
     // sequence of indices for vertical seam
-    public int[] findVerticalSeam()
+    public int[] findVerticalSeam() {
+        transposeH();
+        int[] seam = searchSeam(width, height);
+        return seam;
+    }
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam)
