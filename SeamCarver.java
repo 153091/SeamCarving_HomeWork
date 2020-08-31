@@ -156,6 +156,72 @@ public class SeamCarver {
         }
     }
 
+    // array of {x-1, x, x+1}
+    private int[] scanX(int X, int last) {
+        int[] scan = new int[3];
+        if (X == 0) scan[0] = last;
+        else        scan[0] = X - 1;
+        scan[1] = X;
+        if (X == last) scan[2] = 0;
+        else           scan[2] = X + 1;
+
+        return scan;
+    }
+
+    // searching for Seam (vertical seam)
+    private int[] searchSeam(int width, int height) {
+        // if height > 2
+        if (height > 2) {
+            double[][] distTo = new double[width][height - 2];
+            int[][] edgeTo = new int[width][height - 2];
+
+            // row 1  == row 0 for distTo/edgeTo
+            // присвоение distTo & edgeTo нулевой строке
+            for (int i = 0; i < width; i++) {
+                distTo[i][0] = dualGradientEnergy[i][1];
+                if (i == 0) edgeTo[i][0] = width - 1;
+                else        edgeTo[i][0] = i -1;
+            }
+
+            // присвоение distTo & edgeTo последующим rows(строкам)
+            /*lastX:[] [] []
+                     \ | /
+            *     j:   []   */
+            for (int j = 1; j < height - 2; j++) {
+                int lastX = j - 1; // предыдущий ряд (где три пикселя)
+                for (int i = 0; i < width; i++) {
+                    int[] idOf3x = scanX(i, width - 1); // x-1, x, x+1
+                    double min = distTo[idOf3x[0]][lastX]; // временно наименьший dist
+                    int minOf3 = idOf3x[0]; // временно наименьший Х с предыдущего row
+                    // looking for minimum dist from previous row
+                    // and edgeTo to vertex with minimal dist
+                    for (int k = 1; k < 3; k++) {
+                        if (distTo[idOf3x[k]][lastX] < min) {
+                            min = distTo[idOf3x[k]][lastX]; // наименьший dist
+                            minOf3 = idOf3x[k];
+                        }
+                    }
+                    // словно в relax: distTo + weight
+                    distTo[i][j] = dualGradientEnergy[i][j + 1] + distTo[minOf3][lastX];
+                    edgeTo[i][j] = minOf3;
+                }
+            }
+
+            // Построение SPT дерева от 0 до h-3 по высоте
+            int minOfX = 0; // временно минимальный x на последнем ряду distTo[][]
+            int lastRowOfdistTo = height - 3;
+            double minAll = distTo[minOfX][lastRowOfdistTo]; // временно минимальный distTo последнего ряда
+            for (int i = 1; i < width; i++) {
+                if (distTo[i][lastRowOfdistTo] < minAll) {
+                    minAll = distTo[i][lastRowOfdistTo]; // минимальный distTo последнего ряда
+                    minOfX = i; // минимальный x на последнем ряду distTo[][]
+                }
+            }
+
+
+        }
+        else {}
+    }
 
     // sequence of indices for horizontal seam
     public int[] findHorizontalSeam()
