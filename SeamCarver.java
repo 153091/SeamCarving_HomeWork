@@ -434,6 +434,6 @@ public class SeamCarver {
     }
 
     //  unit testing (optional)
-    public static void main(String[] args)
+    public static void main(String[] args) {}
 
 }
