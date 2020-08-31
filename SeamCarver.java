@@ -176,7 +176,7 @@ public class SeamCarver {
             int[][] edgeTo = new int[width][height - 2];
 
             // row 1  == row 0 for distTo/edgeTo
-            // присвоение distTo & edgeTo нулевой строке
+            // присвоение distTo & edgeTo нулевой строке этих массивов
             for (int i = 0; i < width; i++) {
                 distTo[i][0] = dualGradientEnergy[i][1];
                 if (i == 0) edgeTo[i][0] = width - 1;
@@ -186,7 +186,7 @@ public class SeamCarver {
             // присвоение distTo & edgeTo последующим rows(строкам)
             /*lastX:[] [] []
                      \ | /
-            *     j:   []   */
+            *     j:  [ ]   */
             for (int j = 1; j < height - 2; j++) {
                 int lastX = j - 1; // предыдущий ряд (где три пикселя)
                 for (int i = 0; i < width; i++) {
@@ -207,7 +207,8 @@ public class SeamCarver {
                 }
             }
 
-            // Построение SPT дерева от 0 до h-3 по высоте
+            // Построение SPT дерева высоты distTO от 0 до h-3 по высоте
+            // на деле это height от 1 по h-2
             int minOfX = 0; // временно минимальный x на последнем ряду distTo[][]
             int lastRowOfdistTo = height - 3;
             double minAll = distTo[minOfX][lastRowOfdistTo]; // временно минимальный distTo последнего ряда
@@ -218,9 +219,32 @@ public class SeamCarver {
                 }
             }
 
+            // построение полного дерева SPT высотой Height [0... h-1]
+            int[] seam = new int[height];
+            if (minOfX == 0) {        // если минимальный Х предпоследнего ряда на позиции 0
+                seam[height - 1] = 0; // то Х последнего ряда будет тоже на позиции 0
+            }
+            else {                    // а иначе Х последнего ряда будет на позиции Х-1
+                seam[height - 1] = minOfX - 1;
+            }
+            seam[height - 2] = minOfX;
+            // добавляем в Seam элементы из edgeTo
+            for (int i = lastRowOfdistTo; i >= 0; i--) {
+                minOfX = edgeTo[minOfX][i];
+                seam[i] = minOfX;
+            }
 
+            return seam;
         }
-        else {}
+        else {
+            // если высотак картинки =2
+            // то просто выбираем нулевой столбец
+            int[] seam = new int[height];
+            for (int i = 0; i < height; i++) {
+                seam[i] = 0;
+            }
+            return seam;
+        }
     }
 
     // sequence of indices for horizontal seam
