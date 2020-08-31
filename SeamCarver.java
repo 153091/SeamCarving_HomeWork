@@ -307,7 +307,68 @@ public class SeamCarver {
             }
         }
 
-        
+        // развернуть горизонтально
+        transposeH();
+
+        width = widthNEW; // widthNEW = width - 1;
+        int[][] pixelRGBofPictureNEW = new int[width][height];
+        // проходя через каждый ряд row
+        // скопируем старрый массив в новый, но без элемента seam[i]
+        // j - ряд (height)  i - столбец (width)
+        //               [width][height]
+        for (int j = 0; j < height; j++) {
+            for (int i = 0; i < seam[j]; i++)
+                pixelRGBofPictureNEW[i][j] = pixelRGBofPicture[i][j];
+            for (int i = seam[j] + 1; i <= width; i++)
+                pixelRGBofPictureNEW[i - 1][j] = pixelRGBofPicture[i][j];
+        }
+
+        // заменяем старый массив цветов на новый
+        pixelRGBofPicture = pixelRGBofPictureNEW;
+
+        // теперь разбираемся с энергией
+        double[][] dualGradientEnergyNEW = new double[width][height];
+            // first line full of 1000.0 (Border)
+            for (int i = 0; i < width; i++)
+                dualGradientEnergyNEW[i][0] = dualGradientEnergy[i][0];
+
+            // ряды между первым и последним [1 по h-2]
+            for (int j = 1; j < height - 1; j++) {
+                // до элемента seam[j]
+                if (seam[j] > 1) {
+                    for (int i = 0; i < seam[j]; i++)
+                        dualGradientEnergyNEW[i][j] = dualGradientEnergy[i][j];
+                }
+                else dualGradientEnergyNEW[0][j] = BORDER;
+
+                // после элемента seam[j]
+                if (seam[j] < width - 1) {
+                    for (int i = seam[j] + 1; i <= width; i++)
+                        dualGradientEnergyNEW[i - 1][j] = dualGradientEnergy[i][j];
+                }
+
+                // расставим BOARD
+                // если индекс удаляемой точки == 1
+                if (seam[j] - 1 == 0) dualGradientEnergyNEW[seam[j] - 1][j] = BORDER;
+                // если seam[j] стоял последним
+                else if (seam[j] == width) dualGradientEnergyNEW[seam[j] - 1][j] = BORDER;
+                // если seam[j] >=2 то для предшествующей точки (seam[j]-1) -расчет энергии
+                else if (seam[j] >= 2) {
+                    dualGradientEnergyNEW[seam[j] - 1][j] = computeEnergy(seam[j] - 1, j);
+                }
+                // если seam[j] была предпоследней, то точка заменится на БОРДЕР
+                if (seam[j] == width - 1) dualGradientEnergyNEW[seam[j]][j] = BORDER;
+                // if seam[j] < width-1, то расчет энергии для точки, которая займет место seam
+                else if ((seam[j] >=1) && (seam[j] < width - 1)) {
+                    dualGradientEnergyNEW[seam[j]][j] = computeEnergy(seam[j], j);
+                }
+            }
+            // last line full of 1000.0 (Border)
+            for (int i = 0; i < width; i++)
+                dualGradientEnergyNEW[i][height - 1] = dualGradientEnergy[i][height - 1];
+
+        // заменяем старый массив энергии на новый
+        dualGradientEnergy = dualGradientEnergyNEW;
     }
 
     //  unit testing (optional)
