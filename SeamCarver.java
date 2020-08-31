@@ -184,9 +184,9 @@ public class SeamCarver {
             }
 
             // присвоение distTo & edgeTo последующим rows(строкам)
-            /*lastX:[] [] []
-                     \ | /
-            *     j:  [ ]   */
+            /*row lastX:[] [] []
+                         \ | /
+            * row     j:  [ ]   */
             for (int j = 1; j < height - 2; j++) {
                 int lastX = j - 1; // предыдущий ряд (где три пикселя)
                 for (int i = 0; i < width; i++) {
@@ -263,10 +263,52 @@ public class SeamCarver {
     }
 
     // remove horizontal seam from current picture
-    public void removeHorizontalSeam(int[] seam)
+    public void removeHorizontalSeam(int[] seam) {
+        if (seam == null) {
+            throw new IllegalArgumentException("argument for removeHorizontalSeam is null");
+        }
+        if (seam.length != width) {
+            throw new IllegalArgumentException("invalid length of seam for Horizontal remove");
+        }
+        for (int i = 0; i < width; i++) {
+            if ((seam[i] < 0) || (seam[i] >= height)) {
+                throw new IllegalArgumentException("invalid entry in seam[i] for Horiz remove");
+            }
+        }
+        int heightNEW = height - 1;
+        for (int i = 0; i < width - 1; i++) {
+            int delta = Math.abs(seam[i] - seam[i + 1]);
+            if ((delta > 1) && ((delta != heightNEW) || (height <= 3))) {
+                throw new IllegalArgumentException("invalid entry in seam[i] for Horiz remove");
+            }
+        }
+
+
+    }
 
     // remove vertical seam from current picture
-    public void removeVerticalSeam(int[] seam)
+    public void removeVerticalSeam(int[] seam) {
+        if (seam == null) {
+            throw new IllegalArgumentException("argument for removeVerticalSeam is null");
+        }
+        if (seam.length != height) {
+            throw new IllegalArgumentException("invalid length of seam for Vertical remove");
+        }
+        for (int i = 0; i < height; i++) {
+            if ((seam[i] < 0) || (seam[i] >= width)) {
+                throw new IllegalArgumentException("invalid entry in seam[i] for Vert remove");
+            }
+        }
+        int widthNEW = width - 1;
+        for (int i = 0; i < height - 1; i++) {
+            int delta = Math.abs(seam[i] - seam[i + 1]);
+            if ((delta > 1) && ((delta != widthNEW) || (width <= 3))) {
+                throw new IllegalArgumentException("invalid entry in seam[i] for Vert remove");
+            }
+        }
+
+        
+    }
 
     //  unit testing (optional)
     public static void main(String[] args)
